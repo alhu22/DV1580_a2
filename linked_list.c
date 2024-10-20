@@ -2,67 +2,81 @@
 #include <stdio.h>  
 #include <pthread.h>
 #include "memory_manager.h"
+#include <stdbool.h>
+
+pthread_mutex_t list_lock;
 
 
 void list_init(Node** head, size_t size){
     mem_init(size);
+    pthread_mutex_init(&list_lock, NULL);
 }
 
 void list_insert(Node** head, uint16_t data){
     Node* new_node = mem_alloc(sizeof(Node));
     new_node->data = data;
     new_node->next = NULL;
-    pthread_mutex_init(&new_node->lock, NULL);
 
     if (*head == NULL) {
         *head = new_node;
     } else {
         Node* temp = *head;
-
+        pthread_mutex_lock(&list_lock);
         while (temp->next != NULL) {
             temp = temp->next;
         }
-        pthread_mutex_lock(&temp->lock);
         temp->next = new_node;
-        pthread_mutex_unlock(&temp->lock);
+        pthread_mutex_unlock(&list_lock);
     }
 
 
 };
+
+
 
 void list_insert_after(Node* prev_node, uint16_t data){
     Node* new_node = (Node*)mem_alloc(sizeof(Node));
     new_node->data = data;
+    pthread_mutex_lock(&list_lock);
     new_node->next = prev_node->next;
-
-    pthread_mutex_lock(&prev_node->lock);
     prev_node->next = new_node;
-    pthread_mutex_unlock(&prev_node->lock);
+    pthread_mutex_unlock(&list_lock);
 
 };
 
 void list_insert_before(Node** head, Node* next_node, uint16_t data){
+
+    if (*head == NULL || next_node == NULL) {
+        printf("The list is empty or the next node is NULL\n");
+        return;
+    }
+
     Node* new_node = (Node*)mem_alloc(sizeof(Node));
+    if (new_node == NULL){
+        printf("Memory allocation failed\n");
+        return;
+    }
+
+
+    pthread_mutex_lock(&list_lock);
     new_node->data = data;
     new_node->next = next_node;
     Node* current = *head;
-    if(next_node == *head){        
-        pthread_mutex_lock(&(*head)->lock);  // Lock the head node
+    if (*head == next_node) {
         new_node->next = *head;
         *head = new_node;
-        pthread_mutex_unlock(&new_node->lock);  // Unlock the new node (head now)
+        pthread_mutex_unlock(&list_lock);
         return;
     }
-    while(current->next != next_node){
+    while (current->next != next_node) {
         current = current->next;
     }
-    pthread_mutex_lock(&current->lock);
     current->next = new_node;
-    pthread_mutex_unlock(&current->lock);
-
+    pthread_mutex_unlock(&list_lock);
 }
 
 void list_delete(Node** head, uint16_t data){
+    pthread_mutex_lock(&list_lock);
     Node* current = *head;
     Node* prev = NULL;
     while(current->data != data){
@@ -73,13 +87,9 @@ void list_delete(Node** head, uint16_t data){
         *head = current->next;
 
     } else {
-        pthread_mutex_lock(&current->lock);
-        pthread_mutex_lock(&prev->lock);
         prev->next = current->next;
-        pthread_mutex_unlock(&prev->lock);
     }
-    pthread_mutex_unlock(&current->lock);
-    pthread_mutex_destroy(&current->lock);
+    pthread_mutex_unlock(&list_lock);
     mem_free(current);
 }
 
@@ -164,8 +174,8 @@ void list_cleanup(Node** head){
     while(current != NULL){
         temp = current;
         current = current->next;
-        pthread_mutex_destroy(&temp->lock);
         mem_free(temp);
     }
     *head = NULL;
+    pthread_mutex_destroy(&list_lock);
 }

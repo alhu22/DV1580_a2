@@ -6,16 +6,17 @@
 #include "memory_manager.h"
 
 
-void* memory_pool;
+Block* memory_pool;
 Block* head_pool;
 pthread_mutex_t lock;
+int globalcount = 0;
 
 // Initialize the memory pool and head block
 void mem_init(size_t size) {
-    memory_pool = malloc(size);
+    memory_pool = malloc(size + sizeof(Block));
     head_pool = (Block*)malloc(sizeof(Block));
     
-    head_pool->size = size;
+    head_pool->size = size + sizeof(Block);
     head_pool->is_free = true;
     head_pool->address = memory_pool;
     head_pool->next = NULL;
@@ -24,6 +25,7 @@ void mem_init(size_t size) {
 
 // Allocate a block of memory
 void* mem_alloc(size_t size) {
+
     pthread_mutex_lock(&lock);
     Block* current = head_pool;
     while (current != NULL) {

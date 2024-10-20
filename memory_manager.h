@@ -2,6 +2,8 @@
 #define MEMORY_MANAGER_H
 
 #include <stddef.h> // For size_t
+#include <stdbool.h> // For bool
+#include <pthread.h> // For pthread_mutex_t
 
 
 
