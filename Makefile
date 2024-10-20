@@ -4,7 +4,7 @@ CFLAGS = -Wall -fPIC
 LIB_NAME = libmemory_manager.so
 
 # Source and Object Files
-SRC = memory_manager.c
+SRC = memory_manager.c linked_list.c
 OBJ = $(SRC:.c=.o)
 
 # Default target
@@ -26,11 +26,11 @@ list: linked_list.o
 
 # Test target to run the memory manager test program
 test_mmanager: $(LIB_NAME)
-	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm  
+	$(CC) -o test_memory_manager test_memory_manager.c -L. -lmemory_manager -lm   # Add -lm for math library
 
 # Test target to run the linked list test program
 test_list: $(LIB_NAME) linked_list.o
-	$(CC) -o test_linked_list linked_list.c test_linked_list.c -L. -lmemory_manager -lm   
+	$(CC) -o test_linked_list linked_list.o test_linked_list.c -L. -lmemory_manager -lm   # Add -lm for math library
 	
 #run tests
 run_tests: run_test_mmanager run_test_list
