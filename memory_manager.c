@@ -18,9 +18,9 @@ pthread_mutex_t lock;
 
 // Initialize the memory pool and head block
 void mem_init(size_t size) {
-    """The function initializes the memory pool and head block.
-    The head block is set to free and points to the memory pool.
-    The function also initializes the mutex lock for thread safety."""
+    """The function initializes the memory pool and head block."""
+    """The head block is set to free and points to the memory pool."""
+    """The function also initializes the mutex lock for thread safety."""
     memory_pool = malloc(size);
     head_pool = malloc(sizeof(Block));
 
@@ -33,8 +33,8 @@ void mem_init(size_t size) {
 
 // Allocate a block of memory
 void* mem_alloc(size_t size) {
-    """The function allocates the first block that have enough size.
-    If the block is larger than the requested size, the block is split into two blocks."""
+    """The function allocates the first block that have enough size."""
+    """If the block is larger than the requested size, the block is split into two blocks."""
     pthread_mutex_lock(&lock);
     Block* current = head_pool;
     while (current != NULL) {
