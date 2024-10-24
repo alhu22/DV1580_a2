@@ -14,13 +14,11 @@ typedef struct Node
 pthread_mutex_t list_lock;
 
 void list_init(Node** head, size_t size){
-    """The function initializes the list and the mutex lock for thread safety."""
     mem_init(size);
     pthread_mutex_init(&list_lock, NULL);
 }
 
 void list_insert(Node** head, uint16_t data){
-    """The function inserts a new node at the end of the list."""
     pthread_mutex_lock(&list_lock);
     Node* new_node = mem_alloc(sizeof(Node));
     new_node->data = data;
@@ -41,7 +39,6 @@ void list_insert(Node** head, uint16_t data){
 }
 
 void list_insert_after(Node* prev_node, uint16_t data){
-    """The function inserts a new node after the specified node."""
     pthread_mutex_lock(&list_lock);
     Node* new_node = mem_alloc(sizeof(Node));
     new_node->data = data;
@@ -52,7 +49,6 @@ void list_insert_after(Node* prev_node, uint16_t data){
 }
 
 void list_insert_before(Node** head, Node* next_node, uint16_t data){
-    """The function inserts a new node before the specified node."""
     pthread_mutex_lock(&list_lock);
     if (*head == NULL || next_node == NULL) {
         printf("The list is empty or the next node is NULL\n");
@@ -81,7 +77,6 @@ void list_insert_before(Node** head, Node* next_node, uint16_t data){
 }
 
 void list_delete(Node** head, uint16_t data){
-    """The function deletes the node with the specified data."""
     pthread_mutex_lock(&list_lock);
     Node* current = *head;
     Node* prev = NULL;
@@ -100,7 +95,6 @@ void list_delete(Node** head, uint16_t data){
 }
 
 Node* list_search(Node** head, uint16_t data){
-    """The function searches for a node with the specified data."""
     Node* current = *head;
     while(current != NULL){
         if(current->data == data){
@@ -112,7 +106,6 @@ Node* list_search(Node** head, uint16_t data){
 }
 
 void list_display(Node** head) {
-    """The function traverse the list and displays every data in the list."""
     Node* current = *head;
     // If the list is empty
     if (current == NULL) {
@@ -130,7 +123,6 @@ void list_display(Node** head) {
 }
 
 void list_display_range(Node** head, Node* start_node, Node* end_node) {
-    """The function displays the data in the list within the specified range."""
     // If the list is empty
     if (*head == NULL) {
         printf("[]");
@@ -168,7 +160,6 @@ void list_display_range(Node** head, Node* start_node, Node* end_node) {
 
 
 int list_count_nodes(Node** head){
-    """The function counts the number of nodes in the list."""
     Node* current = *head;
     int count = 0;
     while(current != NULL){
@@ -179,7 +170,6 @@ int list_count_nodes(Node** head){
 }
 
 void list_cleanup(Node** head){
-    """The function frees the memory allocated for the list."""
     pthread_mutex_lock(&list_lock);
     Node* current = *head;
     Node* temp;
