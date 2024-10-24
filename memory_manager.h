@@ -69,4 +69,5 @@ extern "C"
 }
 #endif
 
+
 #endif // MEMORY_MANAGER_H
